@@ -1,10 +1,13 @@
-import { Component } from 'react';
+import React, { Component, Fragment } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
 import Navbar from './components/layout/Navbar';
 import Users from './components/users/Users';
 import Search from './components/users/Search';
 import Alert from './components/layout/Alert';
+import About from './components/pages/About';
+
 class App extends Component {
   state = {
     users: [],
@@ -16,7 +19,6 @@ class App extends Component {
     this.fetchUsers();
   }
 
-  // search/fetch github users
   fetchUsers = async (query = '') => {
     this.setState({ loading: true });
 
@@ -36,12 +38,13 @@ class App extends Component {
         });
       }
     } catch (error) {
-      this.setState({ alert: { msg: 'Error fetching data:', type: 'danger' } });
-      this.setState({ loading: false });
+      this.setState({
+        alert: { msg: 'Error fetching data:', type: 'danger' },
+        loading: false,
+      });
     }
   };
 
-  // clear users from state
   clearUsers = () => {
     this.setState({ users: [], loading: false, alert: null });
   };
@@ -53,24 +56,35 @@ class App extends Component {
   };
 
   render() {
-    const { loading, users } = this.state;
+    const { loading, users, alert } = this.state;
 
     return (
-      <div className="App">
-        <Navbar />
-        <div className="container">
-          <Alert alert={this.state.alert} />
-
-          <Search
-            searchUsers={this.fetchUsers}
-            clearUsers={this.clearUsers}
-            showClear={users.length > 0 ? true : false}
-            setAlert={this.setAlert}
-          />
-
-          <Users loading={loading} users={users} />
+      <Router>
+        <div className="App">
+          <Navbar />
+          <div className="container">
+            <Alert alert={alert} />
+            <Routes>
+              <Route
+                exact
+                path="/"
+                element={
+                  <Fragment>
+                    <Search
+                      searchUsers={this.fetchUsers}
+                      clearUsers={this.clearUsers}
+                      showClear={users.length > 0}
+                      setAlert={this.setAlert}
+                    />
+                    <Users loading={loading} users={users} />
+                  </Fragment>
+                }
+              />
+              <Route exact path="/about" element={<About />} />
+            </Routes>
+          </div>
         </div>
-      </div>
+      </Router>
     );
   }
 }
