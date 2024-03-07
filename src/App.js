@@ -36,7 +36,7 @@ class App extends Component {
         });
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      this.setState({ alert: { msg: 'Error fetching data:', type: 'danger' } });
       this.setState({ loading: false });
     }
   };
