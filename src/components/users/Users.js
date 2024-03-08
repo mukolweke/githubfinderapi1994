@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import UserItem from './UserItem';
 import Spinner from '../layout/Spinner';
-import PropTypes from 'prop-types';
+import GithubContext from '../../context/github/githubContext';
 
-const Users = ({ loading, users }) => {
+const Users = () => {
+  const githubContext = useContext(GithubContext);
+
+  const { loading, users } = githubContext;
+
+  useEffect(() => {
+    githubContext.searchUsers();
+    // eslint-disable-next-line
+  }, []);
+
   return (
     <>
       {loading ? (
@@ -17,11 +26,6 @@ const Users = ({ loading, users }) => {
       )}
     </>
   );
-};
-
-Users.propTypes = {
-  loading: PropTypes.bool.isRequired,
-  users: PropTypes.array.isRequired,
 };
 
 const userStyle = {
