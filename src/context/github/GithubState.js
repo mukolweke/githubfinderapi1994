@@ -40,7 +40,7 @@ const GithubState = (props) => {
       const { data } = await axios.get(
         `https://api.github.com/${
           query ? `search/users?q=${query}&` : 'users?'
-        }` + `client_id=${githubClientId}&client_secret=${githubClientSecret}`,
+        } client_id=${githubClientId}&client_secret=${githubClientSecret}`,
       );
 
       if (data) {
