@@ -10,7 +10,8 @@ const User = ({ getUser, getUserRepos, user, loading, repos }) => {
   useEffect(() => {
     getUser(username);
     getUserRepos(username);
-  }, [getUser, getUserRepos, username]);
+    // eslint-disable-next-line
+  }, []);
 
   const {
     name,
@@ -31,7 +32,7 @@ const User = ({ getUser, getUserRepos, user, loading, repos }) => {
   if (loading) return <Spinner />;
 
   return (
-    <Fragment>
+     <Fragment>
       <Link to="/" className="btn btn-light">
         Back To Search
       </Link>

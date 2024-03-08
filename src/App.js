@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { useState, Fragment, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
@@ -9,21 +9,19 @@ import Alert from './components/layout/Alert';
 import About from './components/pages/About';
 import User from './components/users/User';
 
-class App extends Component {
-  state = {
-    users: [],
-    user: {},
-    loading: false,
-    alert: null,
-    repos: [],
-  };
+const App = () => {
+  const [users, setUsers] = useState([]);
+  const [user, setUser] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState(null);
+  const [repos, setRepos] = useState([]);
 
-  componentDidMount() {
-    this.fetchUsers();
-  }
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-  getUser = async (username) => {
-    this.setState({ loading: true });
+  const getUser = async (username) => {
+    setLoading(true);
 
     try {
       const { data } = await axios.get(
@@ -31,22 +29,18 @@ class App extends Component {
       );
 
       if (data) {
-        this.setState({
-          loading: false,
-          alert: null,
-          user: data,
-        });
+        setLoading(false);
+        setUser(data);
+        setAlert(null);
       }
     } catch (error) {
-      this.setState({
-        alert: { msg: 'Error fetching data:', type: 'danger' },
-        loading: false,
-      });
+      setAlert({ msg: 'Error fetching data:', type: 'danger' });
+      setLoading(false);
     }
   };
 
-  getUserRepos = async (username) => {
-    this.setState({ loading: true });
+  const getUserRepos = async (username) => {
+    setLoading(true);
 
     try {
       const { data } = await axios.get(
@@ -54,22 +48,18 @@ class App extends Component {
       );
 
       if (data) {
-        this.setState({
-          loading: false,
-          alert: null,
-          repos: data,
-        });
+        setLoading(false);
+        setRepos(data);
+        setAlert(null);
       }
     } catch (error) {
-      this.setState({
-        alert: { msg: 'Error fetching data:', type: 'danger' },
-        loading: false,
-      });
+      setAlert({ msg: 'Error fetching data:', type: 'danger' });
+      setLoading(false);
     }
   };
 
-  fetchUsers = async (query = '') => {
-    this.setState({ loading: true });
+  const fetchUsers = async (query = '') => {
+    setLoading(true);
 
     try {
       const { data } = await axios.get(
@@ -80,75 +70,68 @@ class App extends Component {
       );
 
       if (data) {
-        this.setState({
-          loading: false,
-          alert: null,
-          users: query ? data.items : data,
-        });
+        setLoading(false);
+        setUsers(query ? data.items : data);
+        setAlert(null);
       }
     } catch (error) {
-      this.setState({
-        alert: { msg: 'Error fetching data:', type: 'danger' },
-        loading: false,
-      });
+      setAlert({ msg: 'Error fetching data:', type: 'danger' });
+      setLoading(false);
     }
   };
 
-  clearUsers = () => {
-    this.setState({ users: [], loading: false, alert: null });
+  const clearUsers = () => {
+    setLoading(false);
+    setUsers([]);
+    setAlert(null);
   };
 
-  setAlert = (msg, type) => {
-    this.setState({ alert: { msg, type } });
-
-    setTimeout(() => this.setState({ alert: null }), 3000);
+  const setAlertMsg = (msg, type) => {
+    setAlert({ msg, type })
+    setTimeout(() => setAlert(null), 3000);
   };
 
-  render() {
-    const { loading, users, user, alert, repos } = this.state;
-
-    return (
-      <Router>
-        <div className="App">
-          <Navbar />
-          <div className="container">
-            <Alert alert={alert} />
-            <Routes>
-              <Route
-                exact
-                path="/"
-                element={
-                  <Fragment>
-                    <Search
-                      searchUsers={this.fetchUsers}
-                      clearUsers={this.clearUsers}
-                      showClear={users.length > 0}
-                      setAlert={this.setAlert}
-                    />
-                    <Users loading={loading} users={users} />
-                  </Fragment>
-                }
-              />
-              <Route
-                exact
-                path="/user/:username"
-                element={
-                  <User
-                    getUser={this.getUser}
-                    getUserRepos={this.getUserRepos}
-                    user={user}
-                    repos={repos}
-                    loading={loading}
+  return (
+    <Router>
+      <div className="App">
+        <Navbar />
+        <div className="container">
+          <Alert alert={alert} />
+          <Routes>
+            <Route
+              exact
+              path="/"
+              element={
+                <Fragment>
+                  <Search
+                    searchUsers={fetchUsers}
+                    clearUsers={clearUsers}
+                    showClear={users.length > 0}
+                    setAlert={setAlertMsg}
                   />
-                }
-              />
-              <Route exact path="/about" element={<About />} />
-            </Routes>
-          </div>
+                  <Users loading={loading} users={users} />
+                </Fragment>
+              }
+            />
+            <Route
+              exact
+              path="/user/:username"
+              element={
+                <User
+                  getUser={getUser}
+                  getUserRepos={getUserRepos}
+                  user={user}
+                  repos={repos}
+                  loading={loading}
+                />
+              }
+            />
+            <Route exact path="/about" element={<About />} />
+          </Routes>
         </div>
-      </Router>
-    );
-  }
-}
+      </div>
+    </Router>
+  );
+};
 
 export default App;
