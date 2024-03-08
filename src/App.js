@@ -7,10 +7,12 @@ import Users from './components/users/Users';
 import Search from './components/users/Search';
 import Alert from './components/layout/Alert';
 import About from './components/pages/About';
+import User from './components/users/User';
 
 class App extends Component {
   state = {
     users: [],
+    user: {},
     loading: false,
     alert: null,
   };
@@ -18,6 +20,29 @@ class App extends Component {
   componentDidMount() {
     this.fetchUsers();
   }
+
+  getUser = async (username) => {
+    this.setState({ loading: true });
+
+    try {
+      const { data } = await axios.get(
+        `https://api.github.com/users/${username}?client_id=${process.env.REACT_APP_CLIENT_ID}&client_secret=${process.env.REACT_APP_CLIENT_SECRET}`,
+      );
+
+      if (data) {
+        this.setState({
+          loading: false,
+          alert: null,
+          user: data,
+        });
+      }
+    } catch (error) {
+      this.setState({
+        alert: { msg: 'Error fetching data:', type: 'danger' },
+        loading: false,
+      });
+    }
+  };
 
   fetchUsers = async (query = '') => {
     this.setState({ loading: true });
@@ -56,7 +81,7 @@ class App extends Component {
   };
 
   render() {
-    const { loading, users, alert } = this.state;
+    const { loading, users, user, alert } = this.state;
 
     return (
       <Router>
@@ -78,6 +103,13 @@ class App extends Component {
                     />
                     <Users loading={loading} users={users} />
                   </Fragment>
+                }
+              />
+              <Route
+                exact
+                path="/user/:username"
+                element={
+                  <User getUser={this.getUser} user={user} loading={loading} />
                 }
               />
               <Route exact path="/about" element={<About />} />
