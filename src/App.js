@@ -15,6 +15,7 @@ class App extends Component {
     user: {},
     loading: false,
     alert: null,
+    repos: [],
   };
 
   componentDidMount() {
@@ -34,6 +35,29 @@ class App extends Component {
           loading: false,
           alert: null,
           user: data,
+        });
+      }
+    } catch (error) {
+      this.setState({
+        alert: { msg: 'Error fetching data:', type: 'danger' },
+        loading: false,
+      });
+    }
+  };
+
+  getUserRepos = async (username) => {
+    this.setState({ loading: true });
+
+    try {
+      const { data } = await axios.get(
+        `https://api.github.com/users/${username}/repos?per_page=5&sort=created;asc&client_id=${process.env.REACT_APP_CLIENT_ID}&client_secret=${process.env.REACT_APP_CLIENT_SECRET}`,
+      );
+
+      if (data) {
+        this.setState({
+          loading: false,
+          alert: null,
+          repos: data,
         });
       }
     } catch (error) {
@@ -81,7 +105,7 @@ class App extends Component {
   };
 
   render() {
-    const { loading, users, user, alert } = this.state;
+    const { loading, users, user, alert, repos } = this.state;
 
     return (
       <Router>
@@ -109,7 +133,13 @@ class App extends Component {
                 exact
                 path="/user/:username"
                 element={
-                  <User getUser={this.getUser} user={user} loading={loading} />
+                  <User
+                    getUser={this.getUser}
+                    getUserRepos={this.getUserRepos}
+                    user={user}
+                    repos={repos}
+                    loading={loading}
+                  />
                 }
               />
               <Route exact path="/about" element={<About />} />
