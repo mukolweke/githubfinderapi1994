@@ -1,14 +1,14 @@
-import React, { useState, Fragment } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import GithubState from './context/github/GithubState';
 import AlertState from './context/alert/AlertState';
 import './App.css';
 import Navbar from './components/layout/Navbar';
-import Users from './components/users/Users';
-import Search from './components/users/Search';
 import Alert from './components/layout/Alert';
 import About from './components/pages/About';
 import User from './components/users/User';
+import Home from './components/pages/Home';
+import NotFound from './components/pages/NotFound';
 
 const App = () => {
   return (
@@ -22,23 +22,13 @@ const App = () => {
               <Alert />
 
               <Routes>
-                <Route
-                  exact
-                  path="/"
-                  element={
-                    <Fragment>
-                      {/* Search Functionality */}
-                      <Search />
+                <Route exact path="/" element={<Home />} />
 
-                      {/* Display Users */}
-                      <Users />
-                    </Fragment>
-                  }
-                />
+                <Route exact path="/about" element={<About />} />
 
                 <Route exact path="/user/:username" element={<User />} />
 
-                <Route exact path="/about" element={<About />} />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
           </div>
