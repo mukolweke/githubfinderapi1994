@@ -1,6 +1,7 @@
 import React, { useState, Fragment, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
+import GithubState from './context/github/GithubState';
 import './App.css';
 import Navbar from './components/layout/Navbar';
 import Users from './components/users/Users';
@@ -87,50 +88,52 @@ const App = () => {
   };
 
   const setAlertMsg = (msg, type) => {
-    setAlert({ msg, type })
+    setAlert({ msg, type });
     setTimeout(() => setAlert(null), 3000);
   };
 
   return (
-    <Router>
-      <div className="App">
-        <Navbar />
-        <div className="container">
-          <Alert alert={alert} />
-          <Routes>
-            <Route
-              exact
-              path="/"
-              element={
-                <Fragment>
-                  <Search
-                    searchUsers={fetchUsers}
-                    clearUsers={clearUsers}
-                    showClear={users.length > 0}
-                    setAlert={setAlertMsg}
+    <GithubState>
+      <Router>
+        <div className="App">
+          <Navbar />
+          <div className="container">
+            <Alert alert={alert} />
+            <Routes>
+              <Route
+                exact
+                path="/"
+                element={
+                  <Fragment>
+                    <Search
+                      searchUsers={fetchUsers}
+                      clearUsers={clearUsers}
+                      showClear={users.length > 0}
+                      setAlert={setAlertMsg}
+                    />
+                    <Users loading={loading} users={users} />
+                  </Fragment>
+                }
+              />
+              <Route
+                exact
+                path="/user/:username"
+                element={
+                  <User
+                    getUser={getUser}
+                    getUserRepos={getUserRepos}
+                    user={user}
+                    repos={repos}
+                    loading={loading}
                   />
-                  <Users loading={loading} users={users} />
-                </Fragment>
-              }
-            />
-            <Route
-              exact
-              path="/user/:username"
-              element={
-                <User
-                  getUser={getUser}
-                  getUserRepos={getUserRepos}
-                  user={user}
-                  repos={repos}
-                  loading={loading}
-                />
-              }
-            />
-            <Route exact path="/about" element={<About />} />
-          </Routes>
+                }
+              />
+              <Route exact path="/about" element={<About />} />
+            </Routes>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </GithubState>
   );
 };
 
